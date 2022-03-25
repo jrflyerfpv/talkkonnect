@@ -47,7 +47,7 @@ var serverindex = flag.String("serverindex", "0", "jump to server index [n]")
 
 func main() {
 
-	config := flag.String("config", "/home/talkkonnect/gocode/src/github.com/talkkonnect/talkkonnect/talkkonnect.xml", "full path to talkkonnect.xml configuration file")
+	config := flag.String("config", "/home/talkkonnect/gocode/src/github.com/jrflyerfpv/talkkonnect/talkkonnect.xml", "full path to talkkonnect.xml configuration file")
 
 	flag.Usage = talkkonnectusage
 	flag.Parse()
