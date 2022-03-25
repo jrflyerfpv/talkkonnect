@@ -595,7 +595,8 @@ func (b *Talkkonnect) cmdSendVoiceTargets(targetID uint32) {
                                                 b.VoiceTargetUserSet(targetID, VoiceTargets)
 
                                                 for _, vtchannel := range vtvalue.Channels.Channel {
-                                                        b.VoiceTargetChannelSet(targetID, vtchannel.Name, vtchannel.>                                                }
+                                                        b.VoiceTargetChannelSet(targetID, vtchannel.Name, vtchannel.Recursive, vtchannel.Links, vtchannel.Group)
+                                                } 
                                         }
                                 }
                         }
