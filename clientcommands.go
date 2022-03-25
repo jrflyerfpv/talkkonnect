@@ -574,6 +574,14 @@ func (b *Talkkonnect) repeatTx() {
 
 func (b *Talkkonnect) cmdSendVoiceTargets(targetID uint32) {
 
+	var actualTargetID int
+	if (targetID > 0) && (VoiceTargetId > 0) {
+		actualTargetID = VoiceTargetId
+	}
+	else {
+		actualTargetID = 0	
+	}
+	
 	GenericCounter = 0
 	for _, account := range Config.Accounts.Account {
 		if account.Default {
@@ -586,11 +594,11 @@ func (b *Talkkonnect) cmdSendVoiceTargets(targetID uint32) {
 						log.Printf("debug: User Requested VT-ID %v\n", vtvalue.Value)
 
 						for _, vtuser := range vtvalue.Users.User {
-							b.VoiceTargetUserSet(vtvalue.Value, vtuser)
+							b.VoiceTargetUserSet(actualTargetID, vtuser)
 						}
 
 						for _, vtchannel := range vtvalue.Channels.Channel {
-							b.VoiceTargetChannelSet(vtvalue.Value, vtchannel.Name, vtchannel.Recursive, vtchannel.Links, vtchannel.Group)
+							b.VoiceTargetChannelSet(actualTargetID, vtchannel.Name, vtchannel.Recursive, vtchannel.Links, vtchannel.Group)
 						}
 					}
 				}
