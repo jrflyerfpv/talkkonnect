@@ -573,13 +573,13 @@ func (b *Talkkonnect) repeatTx() {
 }
 
 func (b *Talkkonnect) cmdSendVoiceTargets(targetID uint32) {
-
 	var actualTargetID int
+	
 	if (targetID > 0) && (VoiceTargetId > 0) {
 		actualTargetID = VoiceTargetId
-	}
-	else {
-		actualTargetID = 0	
+	} else {
+		actualTargetID = targetID
+		VoiceTargetId = targetID
 	}
 	
 	GenericCounter = 0
