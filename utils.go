@@ -560,3 +560,12 @@ func (b *Talkkonnect) VTMove(command string) {
 	}
 	b.cmdSendVoiceTargets(TargetID)
 }
+
+func appendIfMissing(slice []string, s string) []string {
+        for _, element := range slice {
+                if element == s {
+                        return slice
+                }
+        }
+        return append(slice, s)
+}
