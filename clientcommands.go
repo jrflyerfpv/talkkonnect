@@ -573,67 +573,68 @@ func (b *Talkkonnect) repeatTx() {
 }
 
 func (b *Talkkonnect) cmdSendVoiceTargets(targetID uint32) {
-	var actualTargetID uint32
-	
-	if (targetID > 0) && (VoiceTargetId > 0) {
-		actualTargetID = VoiceTargetId
-	} else {
-		actualTargetID = targetID
-		VoiceTargetId = targetID
-	}
-	
-	GenericCounter = 0
-	for _, account := range Config.Accounts.Account {
-		if account.Default {
-			for _, vtvalue := range account.Voicetargets.ID {
+        GenericCounter = 0
+        for _, account := range Config.Accounts.Account {
+                if account.Default {
+                        for _, vtvalue := range account.Voicetargets.ID {
 
-				if GenericCounter == AccountIndex {
+                                if GenericCounter == AccountIndex {
 
-					if vtvalue.Value == targetID {
-						log.Println("debug: Account Index ", GenericCounter, vtvalue)
-						log.Printf("debug: User Requested VT-ID %v\n", vtvalue.Value)
+                                        if vtvalue.Value == targetID {
+                                                log.Println("debug: Account Index ", GenericCounter, vtvalue)
+                                                log.Printf("debug: User Requested VT-ID %v\n", vtvalue.Value)
 
-						for _, vtuser := range vtvalue.Users.User {
-							b.VoiceTargetUserSet(actualTargetID, vtuser)
-						}
+                                                if targetID > 0 {
+                                                        for _, user := range vtvalue.Users.User {
+                                                                VoiceTargets = appendIfMissing(VoiceTargets, user)
+                                                        }
+                                                } else {
+                                                        VoiceTargets = nil
+                                                }
 
-						for _, vtchannel := range vtvalue.Channels.Channel {
-							b.VoiceTargetChannelSet(actualTargetID, vtchannel.Name, vtchannel.Recursive, vtchannel.Links, vtchannel.Group)
-						}
-					}
-				}
-			}
-			GenericCounter++
-		}
-	}
+                                                b.VoiceTargetUserSet(targetID, VoiceTargets)
+
+                                                for _, vtchannel := range vtvalue.Channels.Channel {
+                                                        b.VoiceTargetChannelSet(targetID, vtchannel.Name, vtchannel.>                                                }
+                                        }
+                                }
+                        }
+                        GenericCounter++
+                }
+        }
 }
 
-func (b *Talkkonnect) VoiceTargetUserSet(TargetID uint32, TargetUser string) {
-	if len(TargetUser) == 0 && TargetID == 0 {
-		TargetUser = b.Client.Self.Name
-	}
+func (b *Talkkonnect) VoiceTargetUserSet(TargetID uint32, TargetUsers []string) {
+        if len(TargetUsers) == 0 && TargetID == 0 {
+		TargetUsers = append(TargetUsers, b.Client.Self.Name)
+        }
 
-	vtUser := b.Client.Users.Find(TargetUser)
-	if (vtUser != nil) && (TargetID <= 31) {
-		vtarget := &gumble.VoiceTarget{}
-		vtarget.ID = TargetID
-		vtarget.AddUser(vtUser)
-		b.Client.VoiceTarget = vtarget
-		if TargetID > 0 {
-			log.Printf("debug: Added User %v to VT ID %v\n", TargetUser, TargetID)
-			b.sevenSegment("voicetarget", strconv.Itoa(int(TargetID)))
-			GPIOOutPin("voicetarget", "on")
-		} else {
-			//b.VoiceTarget.Clear()
-			GPIOOutPin("voicetarget", "off")
-			log.Println("debug: Cleared Voice Targets")
-			b.sevenSegment("voicetarget", strconv.Itoa(int(TargetID)))
-		}
-		b.Client.Send(vtarget)
-	} else {
-		log.Printf("error: Cannot Add User %v to VT ID %v\n", TargetUser, TargetID)
-	}
-
+        if (TargetID <= 31) {
+                vtarget := &gumble.VoiceTarget{}
+                vtarget.ID = TargetID
+                for _, targetUser := range TargetUsers {
+                        vtUser := b.Client.Users.Find(targetUser)
+                        if (vtUser != nil) {
+                                vtarget.AddUser(vtUser)
+                        }
+                }
+                b.Client.VoiceTarget = vtarget
+                if TargetID > 0 {
+                        for _, user := range TargetUsers {
+                                log.Printf("debug: Added User %v to VT ID %v\n", user, TargetID)
+                        }
+                        b.sevenSegment("voicetarget", strconv.Itoa(int(TargetID)))
+                        GPIOOutPin("voicetarget", "on")
+                } else {
+                        //b.VoiceTarget.Clear()
+                        GPIOOutPin("voicetarget", "off")
+                        log.Println("debug: Cleared Voice Targets")
+                        b.sevenSegment("voicetarget", strconv.Itoa(int(TargetID)))
+                }
+                b.Client.Send(vtarget)
+        } else {
+                log.Printf("error: VT ID %v out of range\n", TargetID)
+        }
 }
 
 func (b *Talkkonnect) VoiceTargetChannelSet(targetID uint32, targetChannelName string, recursive bool, links bool, group string) {
