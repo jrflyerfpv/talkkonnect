@@ -649,6 +649,7 @@ var (
 	LCDIsDark               bool
 	GPSDataChannelReceivers int
 	TXLockOut               bool
+	VoiceTargetId           int
 )
 
 // Generic Global Counter Variables
